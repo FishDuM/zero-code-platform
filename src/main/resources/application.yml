@@ -1,0 +1,16 @@
+server:
+  port: 8123
+spring:
+  application:
+    name: zero-code-platform
+# springdoc-openapi
+springdoc:
+  group-configs:
+    - group: 'default'
+      packages-to-scan: hk.ljx.zerocodeplatform.controller
+# knife4j
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
