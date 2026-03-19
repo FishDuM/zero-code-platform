@@ -1,14 +1,19 @@
 package hk.ljx.zerocodeplatform.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import hk.ljx.zerocodeplatform.constant.UserConstant;
 import hk.ljx.zerocodeplatform.exception.BusinessException;
 import hk.ljx.zerocodeplatform.exception.ErrorCode;
+import hk.ljx.zerocodeplatform.exception.ThrowUtils;
 import hk.ljx.zerocodeplatform.model.entity.User;
 import hk.ljx.zerocodeplatform.mapper.UserMapper;
 import hk.ljx.zerocodeplatform.model.enums.UserRoleEnum;
+import hk.ljx.zerocodeplatform.model.vo.LoginUserVO;
 import hk.ljx.zerocodeplatform.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -63,6 +68,45 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>  implements U
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
         }
         return user.getId();
+    }
+
+    /**
+     * 用户登录
+     *
+     * @param userAccount  用户账户
+     * @param userPassword 用户密码
+     * @param request      请求
+     * @return 脱敏后的用户
+     */
+    @Override
+    public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
+        if (StrUtil.hasBlank(userAccount, userPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        ThrowUtils.throwIf(userAccount.length() < 4, ErrorCode.PARAMS_ERROR, "账号错误");
+        ThrowUtils.throwIf(userPassword.length() < 8, ErrorCode.PARAMS_ERROR, "密码错误");
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("userAccount", userAccount);
+        queryWrapper.eq("userPassword", getEncryptPassword(userPassword));
+        User user = this.mapper.selectOneByQuery(queryWrapper);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        return getLoginUserVO(user);
+    }
+
+    /**
+     * 用户脱敏
+     *
+     * @param user 脱敏前用户
+     * @return 脱敏后的用户
+     */
+    @Override
+    public LoginUserVO getLoginUserVO(User user) {
+        if (user == null) {
+            return null;
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        BeanUtil.copyProperties(user, loginUserVO);
+        return loginUserVO;
     }
 
     /**

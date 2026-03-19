@@ -5,8 +5,11 @@ import hk.ljx.zerocodeplatform.common.BaseResponse;
 import hk.ljx.zerocodeplatform.common.ResultUtils;
 import hk.ljx.zerocodeplatform.exception.ErrorCode;
 import hk.ljx.zerocodeplatform.exception.ThrowUtils;
+import hk.ljx.zerocodeplatform.model.dto.UserLoginRequest;
 import hk.ljx.zerocodeplatform.model.dto.UserRegisterRequest;
+import hk.ljx.zerocodeplatform.model.vo.LoginUserVO;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +41,7 @@ public class UserController {
      * @param userRegisterRequest 用户注册请求类
      * @return 新用户 id
      */
-    @PostMapping("register")
+    @PostMapping("/register")
     public BaseResponse<Long> register(@RequestBody UserRegisterRequest userRegisterRequest) {
         // 校验请求类
         ThrowUtils.throwIf(userRegisterRequest == null, ErrorCode.PARAMS_ERROR);
@@ -49,6 +52,22 @@ public class UserController {
 
         long registerUserId = userService.userRegister(userAccount, userPassword, checkPassword);
         return ResultUtils.success(registerUserId);
+    }
+
+    /**
+     * 用户登录
+     *
+     * @param userLoginRequest 用户登录请求类
+     * @param request          请求
+     * @return 登录用户脱敏后的信息
+     */
+    @PostMapping("/login")
+    public BaseResponse<LoginUserVO> login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(userLoginRequest == null, ErrorCode.PARAMS_ERROR);
+        String userAccount = userLoginRequest.getUserAccount();
+        String userPassword = userLoginRequest.getUserPassword();
+        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
+        return ResultUtils.success(loginUserVO);
     }
 
     /**
