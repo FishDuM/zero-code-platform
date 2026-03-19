@@ -5,6 +5,11 @@ server:
 spring:
   application:
     name: zero-code-platform
+  datasource:
+    password: 123456
+    username: root
+    url: jdbc:mysql://127.0.0.1:3306/zero_code_platform?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
 # springdoc-openapi
 springdoc:
   group-configs:
@@ -15,4 +20,3 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
-

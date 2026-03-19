@@ -26,12 +26,7 @@ const route = useRoute()
 
 const currentRoute = computed(() => route.path)
 
-const menuItems = ref([
-  { key: '/', label: '首页' },
-  { key: '/features', label: '功能' },
-  { key: '/docs', label: '文档' },
-  { key: '/about', label: '关于' },
-])
+const menuItems = ref([{ key: '/', label: '首页' }])
 
 const handleMenuClick = ({ key }: { key: string }) => {
   router.push(key)
