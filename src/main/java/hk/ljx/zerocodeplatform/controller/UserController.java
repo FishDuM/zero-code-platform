@@ -1,6 +1,12 @@
 package hk.ljx.zerocodeplatform.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import hk.ljx.zerocodeplatform.common.BaseResponse;
+import hk.ljx.zerocodeplatform.common.ResultUtils;
+import hk.ljx.zerocodeplatform.exception.ErrorCode;
+import hk.ljx.zerocodeplatform.exception.ThrowUtils;
+import hk.ljx.zerocodeplatform.model.dto.UserRegisterRequest;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +29,27 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
+    @Resource
     private UserService userService;
+
+    /**
+     * 用户注册
+     *
+     * @param userRegisterRequest 用户注册请求类
+     * @return 新用户 id
+     */
+    @PostMapping("register")
+    public BaseResponse<Long> register(@RequestBody UserRegisterRequest userRegisterRequest) {
+        // 校验请求类
+        ThrowUtils.throwIf(userRegisterRequest == null, ErrorCode.PARAMS_ERROR);
+        // 获取参数
+        String userAccount = userRegisterRequest.getUserAccount();
+        String userPassword = userRegisterRequest.getUserPassword();
+        String checkPassword = userRegisterRequest.getCheckPassword();
+
+        long registerUserId = userService.userRegister(userAccount, userPassword, checkPassword);
+        return ResultUtils.success(registerUserId);
+    }
 
     /**
      * 保存用户。
@@ -90,5 +115,4 @@ public class UserController {
     public Page<User> page(Page<User> page) {
         return userService.page(page);
     }
-
 }
