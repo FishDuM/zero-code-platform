@@ -1,9 +1,14 @@
 package hk.ljx.zerocodeplatform.service;
 
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
+import hk.ljx.zerocodeplatform.model.dto.UserQueryRequest;
 import hk.ljx.zerocodeplatform.model.entity.User;
 import hk.ljx.zerocodeplatform.model.vo.LoginUserVO;
+import hk.ljx.zerocodeplatform.model.vo.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 /**
  * 用户 服务层。
@@ -54,6 +59,29 @@ public interface UserService extends IService<User> {
      */
     LoginUserVO getLoginUserVO(User user);
 
+    /**
+     * 获取脱敏的用户信息
+     *
+     * @param user 用户信息
+     * @return 脱敏的用户信息
+     */
+    UserVO getUserVO(User user);
+
+    /**
+     * 获取脱敏的用户信息(分页)
+     *
+     * @param userList 用户列表
+     * @return 脱敏的用户信息
+     */
+    List<UserVO> getUserVOList(List<User> userList);
+
+    /**
+     * 获取查询查询条件
+     *
+     * @param userQueryRequest 用户查询类
+     * @return 查询条件
+     */
+    QueryWrapper getQueryWrapper(UserQueryRequest userQueryRequest);
 
     /**
      * 获取用户加密后的密码

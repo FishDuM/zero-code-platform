@@ -1,6 +1,7 @@
 package hk.ljx.zerocodeplatform.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
@@ -8,14 +9,21 @@ import hk.ljx.zerocodeplatform.constant.UserConstant;
 import hk.ljx.zerocodeplatform.exception.BusinessException;
 import hk.ljx.zerocodeplatform.exception.ErrorCode;
 import hk.ljx.zerocodeplatform.exception.ThrowUtils;
+import hk.ljx.zerocodeplatform.model.dto.UserQueryRequest;
 import hk.ljx.zerocodeplatform.model.entity.User;
 import hk.ljx.zerocodeplatform.mapper.UserMapper;
 import hk.ljx.zerocodeplatform.model.enums.UserRoleEnum;
 import hk.ljx.zerocodeplatform.model.vo.LoginUserVO;
+import hk.ljx.zerocodeplatform.model.vo.UserVO;
 import hk.ljx.zerocodeplatform.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static hk.ljx.zerocodeplatform.constant.UserConstant.USER_LOGIN_STATE;
 
@@ -140,6 +148,55 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>  implements U
         LoginUserVO loginUserVO = new LoginUserVO();
         BeanUtil.copyProperties(user, loginUserVO);
         return loginUserVO;
+    }
+
+    /**
+     * 用户脱敏
+     *
+     * @param user 脱敏前用户
+     * @return 脱敏后的用户
+     */
+    @Override
+    public UserVO getUserVO(User user) {
+        ThrowUtils.throwIf(user == null, ErrorCode.PARAMS_ERROR, "用户不存在");
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return userVO;
+    }
+
+    /**
+     * 获取脱敏用户列表
+     *
+     * @param userList 脱敏前用户列表
+     * @return 脱敏后的用户列表
+     */
+    @Override
+    public List<UserVO> getUserVOList(List<User> userList) {
+        if (CollUtil.isEmpty(userList)) {
+            return new ArrayList<>();
+        }
+        return userList.stream().map(this::getUserVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public QueryWrapper getQueryWrapper(UserQueryRequest userQueryRequest) {
+        ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR, "查询参数不能为空");
+
+        Long id = userQueryRequest.getId();
+        String userName = userQueryRequest.getUserName();
+        String userAccount = userQueryRequest.getUserAccount();
+        String userProfile = userQueryRequest.getUserProfile();
+        String userRole = userQueryRequest.getUserRole();
+        String sortField = userQueryRequest.getSortField();
+        String sortOrder = userQueryRequest.getSortOrder();
+
+        return QueryWrapper.create()
+                .eq(User::getId, id)
+                .like(User::getUserName, userName)
+                .like(User::getUserAccount, userAccount)
+                .like(User::getUserProfile, userProfile)
+                .eq(User::getUserRole, userRole)
+                .orderBy(sortField, "ascend".equals(sortOrder));
     }
 
     /**
