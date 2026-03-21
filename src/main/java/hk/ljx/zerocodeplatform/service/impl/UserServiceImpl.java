@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import static hk.ljx.zerocodeplatform.constant.UserConstant.USER_LOGIN_STATE;
+
 /**
  * 用户 服务层实现。
  *
@@ -92,8 +94,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>  implements U
         queryWrapper.eq("userPassword", userPassword);
         User user = this.mapper.selectOneByQuery(queryWrapper);
         ThrowUtils.throwIf(user == null, ErrorCode.PARAMS_ERROR, "用户不存在");
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        request.getSession().setAttribute(USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
+    }
+
+    /**
+     * 获取已登陆用户信息
+     * @param request request请求
+     * @return 用户信息
+     */
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        User user = (User) request.getAttribute(USER_LOGIN_STATE);
+        ThrowUtils.throwIf(user==null||user.getId()==null, ErrorCode.PARAMS_ERROR, "未登录");
+        user = this.mapper.selectOneById(user.getId());
+        ThrowUtils.throwIf(user == null, ErrorCode.PARAMS_ERROR, "未登录");
+        return user;
     }
 
     /**
