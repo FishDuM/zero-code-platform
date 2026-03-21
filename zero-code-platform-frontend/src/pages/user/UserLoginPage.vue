@@ -36,13 +36,35 @@
 </template>
 <script lang="ts" setup>
 import { reactive } from 'vue';
+import { login } from '@/api/userController.ts'
+import { useLoginUserStore } from '@/stores/LoginUser.ts'
+import { useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 
 const formState = reactive<API.UserLoginRequest>({
   userAccount: '',
   userPassword: '',
 });
-const handleSubmit = (values: any) => {
-  console.log('Success:', values);
+
+const loginUserStore = useLoginUserStore()
+const router = useRouter()
+
+/**
+ * 提交表单
+ * @param values
+ */
+const handleSubmit = async (values: any) => {
+  const res = await login(values)
+  if (res.code === 0 || res.data.data) {
+    await loginUserStore.fetchLoginUser()
+    message.success("登陆成功")
+    await router.push({
+      path: '/',
+      replace: true
+    })
+  }else {
+    message.error("登陆失败:"+res.data.message)
+  }
 };
 
 </script>
