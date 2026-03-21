@@ -85,12 +85,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>  implements U
         }
         ThrowUtils.throwIf(userAccount.length() < 4, ErrorCode.PARAMS_ERROR, "账号错误");
         ThrowUtils.throwIf(userPassword.length() < 8, ErrorCode.PARAMS_ERROR, "密码错误");
+        // 加密
+        userPassword = getEncryptPassword(userPassword);
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("userAccount", userAccount);
-        queryWrapper.eq("userPassword", getEncryptPassword(userPassword));
+        queryWrapper.eq("userPassword", userPassword);
         User user = this.mapper.selectOneByQuery(queryWrapper);
+        ThrowUtils.throwIf(user == null, ErrorCode.PARAMS_ERROR, "用户不存在");
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
-        return getLoginUserVO(user);
+        return this.getLoginUserVO(user);
     }
 
     /**
