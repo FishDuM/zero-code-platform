@@ -12,7 +12,17 @@
       @click="handleMenuClick"
     />
     <div class="user">
-      <a-button type="primary">登录</a-button>
+      <div v-if="userLoginStore.loginUser.id">
+        <a-space>
+          <a-avatar :src="userLoginStore.loginUser.userAvatar" />
+          {{userLoginStore.loginUser.userName}}
+        </a-space>
+
+      </div>
+      <div v-else>
+        <a-button type="primary" href="/user/login">登录</a-button>
+
+      </div>
     </div>
   </a-layout-header>
 </template>
@@ -20,6 +30,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useLoginUserStore } from '@/stores/LoginUser.ts'
+
+// 获取登陆用户状态
+const userLoginStore = useLoginUserStore()
 
 const router = useRouter()
 const route = useRoute()
