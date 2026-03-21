@@ -105,11 +105,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>  implements U
      */
     @Override
     public User getLoginUser(HttpServletRequest request) {
-        User user = (User) request.getAttribute(USER_LOGIN_STATE);
+        User user = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
         ThrowUtils.throwIf(user==null||user.getId()==null, ErrorCode.PARAMS_ERROR, "未登录");
         user = this.mapper.selectOneById(user.getId());
         ThrowUtils.throwIf(user == null, ErrorCode.PARAMS_ERROR, "未登录");
         return user;
+    }
+
+    /**
+     * 用户退出登录
+     * @param request request请求
+     * @return 退出登录结果
+     */
+    @Override
+    public boolean userLogout(HttpServletRequest request) {
+        // 判断用户是否登陆
+        User user = this.getLoginUser(request);
+        ThrowUtils.throwIf(user==null, ErrorCode.PARAMS_ERROR, "未登录");
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return true;
     }
 
     /**

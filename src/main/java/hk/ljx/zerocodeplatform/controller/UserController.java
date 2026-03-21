@@ -82,6 +82,21 @@ public class UserController {
     }
 
     /**
+     * 用户注销
+     *
+     * @param request 请求
+     * @return 是否注销成功
+     */
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR);
+        boolean result = userService.userLogout(request);
+        return ResultUtils.success(result);
+    }
+
+
+
+    /**
      * 保存用户。
      *
      * @param user 用户
