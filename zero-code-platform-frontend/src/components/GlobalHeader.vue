@@ -36,13 +36,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useLoginUserStore } from '@/stores/LoginUser.ts'
 import { LogoutOutlined } from '@ant-design/icons-vue'
 import { userLogout } from '@/api/userController.ts'
 import { message } from 'ant-design-vue'
-
+import { h } from 'vue'
+import { HomeOutlined, BarChartOutlined} from '@ant-design/icons-vue';
 // 获取登陆用户状态
 const userLoginStore = useLoginUserStore()
 
@@ -51,7 +52,38 @@ const route = useRoute()
 
 const currentRoute = computed(() => route.path)
 
-const menuItems = ref([{ key: '/', label: '首页' }])
+// 菜单配置项
+const originItems = [
+  {
+    key: '/',
+    icon: h(HomeOutlined),
+    label: '主页',
+    title: '主页',
+  },
+  {
+    key: '/admin/userManage',
+    icon: h(BarChartOutlined),
+    label: '用户管理',
+    title: '用户管理',
+  },
+]
+
+// 过滤菜单项
+const filterMenus = (menus = [] as MenuProps['items']) => {
+  return menus?.filter((menu) => {
+    const menuKey = menu?.key as string
+    if (menuKey?.startsWith('/admin')) {
+      const loginUser = userLoginStore.loginUser
+      if (!loginUser || loginUser.userRole !== 'admin') {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+// 展示在菜单的路由数组
+const menuItems = computed<MenuProps['items']>(() => filterMenus(originItems))
 
 const handleMenuClick = ({ key }: { key: string }) => {
   router.push(key)
