@@ -16,8 +16,6 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static hk.ljx.zerocodeplatform.constant.UserConstant.USER_LOGIN_STATE;
-
 @Aspect
 @Component
 public class AuthInterceptor {
