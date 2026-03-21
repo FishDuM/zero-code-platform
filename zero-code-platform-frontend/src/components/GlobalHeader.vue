@@ -41,7 +41,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useLoginUserStore } from '@/stores/LoginUser.ts'
 import { LogoutOutlined } from '@ant-design/icons-vue'
 import { userLogout } from '@/api/userController.ts'
-import { message } from 'ant-design-vue'
+import { type MenuProps, message } from 'ant-design-vue'
 import { h } from 'vue'
 import { HomeOutlined, BarChartOutlined} from '@ant-design/icons-vue';
 // 获取登陆用户状态
